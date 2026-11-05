@@ -22,7 +22,6 @@ type Props = {
   src: string
   titulo: string
   categoria: string
-  numero: string
   formato: 'horizontal' | 'vertical'
   poster?: string
 }
@@ -31,7 +30,6 @@ export default function VideoPlayer({
   src,
   titulo,
   categoria,
-  numero,
   formato,
   poster,
 }: Props) {
@@ -132,98 +130,100 @@ export default function VideoPlayer({
   const progreso = duracion ? (tiempo / duracion) * 100 : 0
 
   return (
-    <article
-      ref={contenedor}
-      className={'video-work ' + formato + (mejorado ? ' enhanced' : '')}
-      data-reveal
-    >
-      <video
-        ref={video}
-        src={src}
-        poster={poster}
-        playsInline
-        loop
-        muted
-        preload="metadata"
-        controls={!mejorado}
-        aria-label={`${titulo} · ${categoria}`}
-        onClick={mejorado ? alternarReproduccion : undefined}
-        onPlay={() => setReproduciendo(true)}
-        onPause={() => setReproduciendo(false)}
-        onTimeUpdate={(e) => setTiempo(e.currentTarget.currentTime)}
-        onLoadedMetadata={(e) => setDuracion(e.currentTarget.duration)}
-        onDurationChange={(e) => setDuracion(e.currentTarget.duration)}
-        onVolumeChange={(e) => setSilenciado(e.currentTarget.muted)}
-      />
-      <span className="video-work-label" aria-hidden="true">
-        <b>/{numero}</b> {titulo}
-      </span>
-      {mejorado && (
-        <div className="video-controls">
-          <div className="video-timeline">
-            <input
-              type="range"
-              className="video-progress"
-              min={0}
-              max={duracion || 0}
-              step={0.01}
-              value={Math.min(tiempo, duracion || 0)}
-              onChange={(e) => buscar(Number(e.currentTarget.value))}
-              aria-label={`Línea de tiempo de ${titulo}`}
-              aria-valuetext={`${formatearTiempo(tiempo)} de ${formatearTiempo(duracion)}`}
-              style={{ '--progreso': `${progreso}%` } as React.CSSProperties}
-            />
+    <figure className={'video-item ' + formato}>
+      <article
+        ref={contenedor}
+        className={'video-work ' + formato + (mejorado ? ' enhanced' : '')}
+        data-reveal
+      >
+        <video
+          ref={video}
+          src={src}
+          poster={poster}
+          playsInline
+          loop
+          muted
+          preload="metadata"
+          controls={!mejorado}
+          aria-label={`${titulo} · ${categoria}`}
+          onClick={mejorado ? alternarReproduccion : undefined}
+          onPlay={() => setReproduciendo(true)}
+          onPause={() => setReproduciendo(false)}
+          onTimeUpdate={(e) => setTiempo(e.currentTarget.currentTime)}
+          onLoadedMetadata={(e) => setDuracion(e.currentTarget.duration)}
+          onDurationChange={(e) => setDuracion(e.currentTarget.duration)}
+          onVolumeChange={(e) => setSilenciado(e.currentTarget.muted)}
+        />
+        {mejorado && (
+          <div className="video-controls">
+            <div className="video-timeline">
+              <input
+                type="range"
+                className="video-progress"
+                min={0}
+                max={duracion || 0}
+                step={0.01}
+                value={Math.min(tiempo, duracion || 0)}
+                onChange={(e) => buscar(Number(e.currentTarget.value))}
+                aria-label={`Línea de tiempo de ${titulo}`}
+                aria-valuetext={`${formatearTiempo(tiempo)} de ${formatearTiempo(duracion)}`}
+                style={{ '--progreso': `${progreso}%` } as React.CSSProperties}
+              />
+            </div>
+            <div className="video-buttons">
+              <button
+                type="button"
+                onClick={() => desplazar(-SALTO)}
+                aria-label={`Retroceder ${SALTO} segundos`}
+                title={`Retroceder ${SALTO} s`}
+              >
+                <Rewind size={18} />
+              </button>
+              <button
+                type="button"
+                className="video-play"
+                onClick={alternarReproduccion}
+                aria-label={
+                  reproduciendo
+                    ? `Pausar ${titulo}`
+                    : `Reproducir ${titulo} desde el inicio`
+                }
+                title={reproduciendo ? 'Pausar' : 'Reproducir desde el inicio'}
+              >
+                {reproduciendo ? (
+                  <Pause size={18} fill="currentColor" />
+                ) : (
+                  <Play size={18} fill="currentColor" />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => desplazar(SALTO)}
+                aria-label={`Adelantar ${SALTO} segundos`}
+                title={`Adelantar ${SALTO} s`}
+              >
+                <FastForward size={18} />
+              </button>
+              <span className="video-time" aria-hidden="true">
+                {formatearTiempo(tiempo)} / {formatearTiempo(duracion)}
+              </span>
+              <button
+                type="button"
+                className="video-sound"
+                onClick={alternarSonido}
+                aria-label={silenciado ? 'Activar sonido' : 'Silenciar'}
+                aria-pressed={!silenciado}
+                title={silenciado ? 'Activar sonido' : 'Silenciar'}
+              >
+                {silenciado ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              </button>
+            </div>
           </div>
-          <div className="video-buttons">
-            <button
-              type="button"
-              onClick={() => desplazar(-SALTO)}
-              aria-label={`Retroceder ${SALTO} segundos`}
-              title={`Retroceder ${SALTO} s`}
-            >
-              <Rewind size={18} />
-            </button>
-            <button
-              type="button"
-              className="video-play"
-              onClick={alternarReproduccion}
-              aria-label={
-                reproduciendo
-                  ? `Pausar ${titulo}`
-                  : `Reproducir ${titulo} desde el inicio`
-              }
-              title={reproduciendo ? 'Pausar' : 'Reproducir desde el inicio'}
-            >
-              {reproduciendo ? (
-                <Pause size={18} fill="currentColor" />
-              ) : (
-                <Play size={18} fill="currentColor" />
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={() => desplazar(SALTO)}
-              aria-label={`Adelantar ${SALTO} segundos`}
-              title={`Adelantar ${SALTO} s`}
-            >
-              <FastForward size={18} />
-            </button>
-            <span className="video-time" aria-hidden="true">
-              {formatearTiempo(tiempo)} / {formatearTiempo(duracion)}
-            </span>
-            <button
-              type="button"
-              className="video-sound"
-              onClick={alternarSonido}
-              aria-label={silenciado ? 'Activar sonido' : 'Silenciar'}
-              aria-pressed={!silenciado}
-              title={silenciado ? 'Activar sonido' : 'Silenciar'}
-            >
-              {silenciado ? <VolumeX size={18} /> : <Volume2 size={18} />}
-            </button>
-          </div>
-        </div>
-      )}
-    </article>
+        )}
+      </article>
+      <figcaption className="video-work-title" data-reveal>
+        {titulo}
+      </figcaption>
+    </figure>
   )
 }
