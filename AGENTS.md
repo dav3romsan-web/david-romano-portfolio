@@ -9,7 +9,9 @@ Este sitio es el portafolio de David Romano Sánchez. Es una sola página con ex
 - `src/components/SiteHeader.tsx`: navegación por anclas, estado de sección activa, menú móvil y selector de tema.
 - `src/routes/__root.tsx`: documento en español, metadatos, inicialización del tema y estructura accesible.
 - `src/styles.css`: identidad visual, variables de temas, tipografía, adaptación móvil y movimiento reducido.
-- `src/data/portfolio.ts`: listas editables de trabajos, vacías de forma intencional, y ruta de la segunda fotografía.
+- `src/data/portfolio.ts`: listas editables de trabajos y ruta de la segunda fotografía. La lista de videos define el orden de la galería; los diseños gráficos siguen vacíos de forma intencional.
+- `src/components/VideoPlayer.tsx`: reproductor con controles propios (Play desde 00:00, pausa, ±5 s, línea de tiempo, sonido). Reproduce en silencio al entrar en pantalla y pausa al salir.
+- `public/trabajos/videos/`: videos verticales 9:16 suministrados por el usuario, copiados sin recomprimir.
 - `src/lib/site.ts`: identidad y metadatos para compartir.
 - `public/img/`: fotografía original suministrada por el usuario, sin alteraciones de rostro ni color.
 - `public/icons/`: logotipos de las aplicaciones; Adobe desde Devicon/Wikimedia y símbolo de CapCut desde Wikimedia.
