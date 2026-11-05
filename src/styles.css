@@ -2004,3 +2004,44 @@ h2 { font-size: clamp(68px, 8.4vw, 122px); }
     clip-path: none;
   }
 }
+
+/* Interacción de contacto: el ícono y el texto pasan al rojo principal. */
+.contact-links > a {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.3s,
+    transform 0.3s,
+    color 0.35s ease,
+    border-color 0.35s ease;
+}
+.contact-links > a svg,
+.contact-links > a small {
+  transition: color 0.35s ease;
+}
+.contact-links > a:hover {
+  background: var(--contact-bg);
+  color: inherit;
+  transform: none;
+}
+@media (hover: hover) {
+  .contact-links > a:hover {
+    background: #111;
+    transform: translateY(-4px);
+  }
+  .contact-links > a:hover,
+  .contact-links > a:hover small {
+    color: var(--red);
+    border-color: var(--red);
+  }
+}
+.contact-links > a:active,
+.contact-links > a:active small,
+.contact-links > a:focus-visible,
+.contact-links > a:focus-visible small {
+  color: var(--red);
+}
+.contact-links > a:active,
+.contact-links > a:focus-visible {
+  background: #111;
+  border-color: var(--red);
+}
