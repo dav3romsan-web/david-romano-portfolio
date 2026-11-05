@@ -6,7 +6,6 @@ import {
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
-  FileText,
   Plus,
   Play,
   X,
@@ -15,7 +14,9 @@ import {
 import { site, pageMeta } from '../lib/site'
 import FluxLines from '../components/FluxLines'
 import VideoPlayer from '../components/VideoPlayer'
+import Folder from '../components/Folder'
 import {
+  categoriasGraficas,
   trabajosGraficos,
   trabajosAudiovisuales,
   segundaFotografia,
@@ -25,7 +26,7 @@ export const Route = createFileRoute('/')({
   head: () => pageMeta('Portafolio', site.description),
 })
 type Media = { title: string; src: string; video?: boolean; serie?: string[] }
-function AnimatedBackground() {
+function useTemaClaro() {
   const [light, setLight] = useState(false)
   useEffect(() => {
     const root = document.documentElement
@@ -35,6 +36,208 @@ function AnimatedBackground() {
     observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] })
     return () => observer.disconnect()
   }, [])
+  return light
+}
+// Tamaño de carpeta según el ancho real de su columna: así entra siempre
+// completa (sin cortes ni desplazamiento horizontal) en cualquier pantalla.
+// La carpeta mide 224 px a tamaño 1; nunca supera el tamaño de escritorio.
+function useTamanoCarpeta(ref: React.RefObject<HTMLDivElement | null>) {
+  const [tamano, setTamano] = useState(1)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || !('ResizeObserver' in window)) return
+    const medir = () => {
+      const ancho = el.clientWidth
+      if (!ancho) return
+      const t = Math.min(1, Math.max(0.5, (ancho * 0.94) / 224))
+      setTamano((prev) => (Math.abs(prev - t) > 0.01 ? t : prev))
+    }
+    medir()
+    const observer = new ResizeObserver(medir)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [ref])
+  return tamano
+}
+type PiezaCarpeta = {
+  image: string
+  title: string
+  alt: string
+  src: string
+  serie?: string[]
+  obra: string
+}
+type Categoria = (typeof categoriasGraficas)[number]
+function piezasDe(categoria: Categoria): PiezaCarpeta[] {
+  return trabajosGraficos
+    .filter((t) => t.categoria === categoria.id)
+    .flatMap((t) => {
+      if (t.tipo === 'pdf') return []
+      const imagenes = t.tipo === 'serie' ? t.imagenes : [t.imagen]
+      return imagenes.map((src, i) => ({
+        image: `/.netlify/images?url=${src}&w=520&fm=webp&q=85`,
+        title:
+          imagenes.length > 1
+            ? `${t.titulo} — imagen ${i + 1} de ${imagenes.length}`
+            : t.titulo,
+        alt: t.titulo,
+        src,
+        serie: t.tipo === 'serie' ? t.imagenes : undefined,
+        obra: t.titulo,
+      }))
+    })
+}
+const verPieza = (p: PiezaCarpeta): Media => ({
+  title: p.obra,
+  src: p.src,
+  serie: p.serie,
+})
+// Rojo puro de la identidad (#ff0000) en todas las caras de la carpeta.
+const ROJO_CARPETA = {
+  '--folder-base': '#ff0000',
+  '--folder-front-top': '#ff0000',
+  '--folder-front-bottom': '#ff0000',
+  '--folder-inside-top': '#ff0000',
+  '--folder-inside-bottom': '#ff0000',
+  '--folder-tab-ink': '#ffffff',
+} as React.CSSProperties
+// Carpeta de una categoría. Nunca se despliega ni desaparece: un toque la
+// selecciona y sus trabajos se muestran en el panel debajo de las cuatro.
+function CarpetaGrafica({
+  numero,
+  categoria,
+  abierta,
+  onAbrir,
+}: {
+  numero: string
+  categoria: Categoria
+  abierta: boolean
+  onAbrir: () => void
+}) {
+  const light = useTemaClaro()
+  const escenario = useRef<HTMLDivElement>(null)
+  const tamano = useTamanoCarpeta(escenario)
+  const piezas = piezasDe(categoria)
+  const cantidad = trabajosGraficos.filter(
+    (t) => t.categoria === categoria.id,
+  ).length
+  return (
+    <article
+      // El estado va en un atributo: cambiar className borraría la clase
+      // «visible» que agrega la animación de entrada y ocultaría la carpeta.
+      className="folder-card"
+      data-abierta={abierta ? '' : undefined}
+      data-reveal
+    >
+      <div className="folder-card-stage" ref={escenario}>
+        <Folder
+          label={categoria.nombre}
+          items={piezas.slice(0, 6)}
+          open={false}
+          ajar={abierta}
+          onOpenChange={onAbrir}
+          closeOnOutsideClick={false}
+          style={ROJO_CARPETA}
+          mode="flap"
+          variant="solid"
+          layout="spread"
+          color="#ff0000"
+          paperColor="#ffffff"
+          tabPosition="right"
+          openOn="click"
+          size={tamano}
+          frost={0.25}
+          tilt={0.5}
+          speed={1}
+          bounce={0.4}
+          peek
+          intro
+          draggable={false}
+          zoomOnClick={false}
+          theme={light ? 'light' : 'dark'}
+        />
+      </div>
+      <div className="folder-card-info">
+        <span className="folder-card-index">/{numero}</span>
+        <h3>{categoria.nombre}</h3>
+        <span className="folder-card-count">
+          <i className="red-dot" />
+          {cantidad
+            ? `${cantidad} ${cantidad === 1 ? 'TRABAJO' : 'TRABAJOS'}`
+            : 'PRÓXIMAMENTE'}
+        </span>
+        {piezas.length > 0 && (
+          <noscript>
+            <ul className="folder-card-fallback">
+              {piezas.map((p) => (
+                <li key={p.src}>
+                  <a href={p.src}>{p.title}</a>
+                </li>
+              ))}
+            </ul>
+          </noscript>
+        )}
+      </div>
+    </article>
+  )
+}
+// Panel con los trabajos de la carpeta seleccionada, debajo de las cuatro.
+function PanelCarpeta({
+  categoria,
+  onCerrar,
+  onVer,
+}: {
+  categoria: Categoria
+  onCerrar: () => void
+  onVer: (m: Media) => void
+}) {
+  const piezas = piezasDe(categoria)
+  return (
+    <div
+      className="folder-panel"
+      role="region"
+      aria-label={`Trabajos de ${categoria.nombre}`}
+      aria-live="polite"
+    >
+      <div className="folder-panel-top">
+        <div>
+          <h3>{categoria.nombre}</h3>
+          <p>{categoria.descripcion}</p>
+        </div>
+        <button type="button" onClick={onCerrar}>
+          OCULTAR <X size={14} aria-hidden="true" />
+        </button>
+      </div>
+      {piezas.length ? (
+        <>
+          <span className="folder-panel-hint">
+            <i className="red-dot" /> ELEGÍ QUÉ IMAGEN QUERÉS VER
+          </span>
+          <div className="folder-picker-grid">
+            {piezas.map((p, i) => (
+              <button
+                type="button"
+                key={p.src}
+                className="folder-thumb"
+                onClick={() => onVer(verPieza(p))}
+                aria-label={`Ver ${p.title}`}
+              >
+                <img src={p.image} alt="" loading="lazy" decoding="async" />
+                <span>{String(i + 1).padStart(2, '0')}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      ) : (
+        <p className="folder-panel-empty">
+          Esta carpeta se completa próximamente.
+        </p>
+      )}
+    </div>
+  )
+}
+function AnimatedBackground() {
+  const light = useTemaClaro()
   const tone = light ? '#000000' : '#ffffff'
   return (
     <FluxLines
@@ -76,7 +279,11 @@ function SectionLabel({
 }
 function PortfolioHome() {
   const [media, setMedia] = useState<Media | null>(null)
+  const [carpetaAbierta, setCarpetaAbierta] = useState<string | null>(null)
+  const categoriaAbierta =
+    categoriasGraficas.find((c) => c.id === carpetaAbierta) ?? null
   const dialog = useRef<HTMLDialogElement>(null)
+  const toque = useRef<number | null>(null)
   const moverSerie = (paso: number) =>
     setMedia((m) => {
       if (!m?.serie) return m
@@ -84,6 +291,16 @@ function PortfolioHome() {
       const i = (m.serie.indexOf(m.src) + paso + n) % n
       return { ...m, src: m.serie[i] }
     })
+  useEffect(() => {
+    // Precarga las imágenes vecinas para que la navegación sea inmediata.
+    if (!media?.serie) return
+    const n = media.serie.length
+    const i = media.serie.indexOf(media.src)
+    for (const paso of [1, -1]) {
+      const img = new Image()
+      img.src = media.serie[(i + paso + n) % n]
+    }
+  }, [media?.src, media?.serie])
   useEffect(() => {
     if (!media?.serie) return
     const tecla = (e: KeyboardEvent) => {
@@ -351,99 +568,29 @@ function PortfolioHome() {
             </span>
           </div>
         </div>
-        <div className="graphic-gallery">
-          {trabajosGraficos.length ? (
-            trabajosGraficos.map((work) => {
-              if (work.tipo === 'pdf')
-                return (
-                  <a
-                    data-reveal
-                    className="work pdf-work"
-                    key={work.archivo}
-                    href={work.archivo}
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    <span className="pdf-cover">
-                      <FileText size={34} />
-                      <b>{work.marca}</b>
-                      <small>PDF</small>
-                    </span>
-                    <span className="work-caption">
-                      <span>{work.titulo}</span>
-                      <ArrowUpRight />
-                    </span>
-                  </a>
+        <div className="graphic-folders">
+          {categoriasGraficas.map((categoria, i) => (
+            <CarpetaGrafica
+              key={categoria.id}
+              numero={String(i + 1).padStart(2, '0')}
+              categoria={categoria}
+              abierta={carpetaAbierta === categoria.id}
+              onAbrir={() =>
+                setCarpetaAbierta((actual) =>
+                  actual === categoria.id ? null : categoria.id,
                 )
-              const portada =
-                work.tipo === 'serie' ? work.imagenes[0] : work.imagen
-              return (
-                <button
-                  data-reveal
-                  className="work"
-                  key={portada}
-                  onClick={() =>
-                    setMedia({
-                      title: work.titulo,
-                      src: portada,
-                      serie: work.tipo === 'serie' ? work.imagenes : undefined,
-                    })
-                  }
-                >
-                  <img loading="lazy" src={portada} alt={work.titulo} />
-                  <span className="work-caption">
-                    <span>{work.titulo}</span>
-                    {work.tipo === 'serie' ? (
-                      <small className="serie-count">
-                        1 / {work.imagenes.length}
-                      </small>
-                    ) : (
-                      <ArrowUpRight />
-                    )}
-                  </span>
-                </button>
-              )
-            })
-          ) : (
-            <>
-              <div className="empty-work large" data-reveal>
-                <div className="empty-art art-one" aria-hidden="true">
-                  <span>
-                    FORMA
-                    <br />
-                    <i>&</i> CONCEPTO
-                  </span>
-                  <div className="crosshair">+</div>
-                </div>
-                <div className="empty-caption">
-                  <span>Identidad y comunicación visual</span>
-                  <span>PRÓXIMAMENTE ↗</span>
-                </div>
-              </div>
-              <div className="empty-work small" data-reveal>
-                <div className="empty-art art-two" aria-hidden="true">
-                  <span className="empty-number">Aa</span>
-                  <span>
-                    EL PODER DE
-                    <br />
-                    LO VISUAL.
-                  </span>
-                </div>
-                <div className="empty-caption">
-                  <span>Diseño editorial y composición</span>
-                  <span>PRÓXIMAMENTE ↗</span>
-                </div>
-              </div>
-              <p className="gallery-message" data-reveal>
-                Las ideas ya están en marcha.
-                <br />
-                <span>
-                  Este espacio se completa con mis proyectos originales.
-                </span>
-              </p>
-            </>
-          )}
+              }
+            />
+          ))}
         </div>
+        {categoriaAbierta && (
+          <PanelCarpeta
+            key={categoriaAbierta.id}
+            categoria={categoriaAbierta}
+            onCerrar={() => setCarpetaAbierta(null)}
+            onVer={setMedia}
+          />
+        )}
       </section>
       <section id="edicion-videos" className="section videos">
         <SectionLabel number="04">HISTORIAS EN MOVIMIENTO</SectionLabel>
@@ -637,6 +784,7 @@ function PortfolioHome() {
       </footer>
       <dialog
         ref={dialog}
+        className="lightbox"
         onCancel={() => setMedia(null)}
         onClick={(e) => {
           if (e.target === e.currentTarget) setMedia(null)
@@ -645,12 +793,19 @@ function PortfolioHome() {
       >
         <div className="modal-top">
           <span>{media?.title}</span>
-          <button
-            onClick={() => setMedia(null)}
-            aria-label="Cerrar vista ampliada"
-          >
-            <X />
-          </button>
+          <div className="modal-actions">
+            {media?.serie && media.serie.length > 1 && (
+              <span className="slide-count" aria-live="polite">
+                {media.serie.indexOf(media.src) + 1} / {media.serie.length}
+              </span>
+            )}
+            <button
+              onClick={() => setMedia(null)}
+              aria-label="Cerrar vista ampliada"
+            >
+              <X />
+            </button>
+          </div>
         </div>
         {media &&
           (media.video ? (
@@ -663,8 +818,30 @@ function PortfolioHome() {
               aria-label={media.title}
             />
           ) : (
-            <div className="modal-slide">
-              <img key={media.src} src={media.src} alt={media.title} />
+            <div
+              className="modal-slide"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) setMedia(null)
+              }}
+              onTouchStart={(e) => {
+                toque.current = e.touches[0].clientX
+              }}
+              onTouchEnd={(e) => {
+                if (toque.current === null || !media.serie) return
+                const dx = e.changedTouches[0].clientX - toque.current
+                toque.current = null
+                if (Math.abs(dx) > 45) moverSerie(dx < 0 ? 1 : -1)
+              }}
+            >
+              <img
+                key={media.src}
+                src={media.src}
+                alt={
+                  media.serie
+                    ? `${media.title} — imagen ${media.serie.indexOf(media.src) + 1} de ${media.serie.length}`
+                    : media.title
+                }
+              />
               {media.serie && media.serie.length > 1 && (
                 <>
                   <button
@@ -681,9 +858,6 @@ function PortfolioHome() {
                   >
                     <ChevronRight />
                   </button>
-                  <span className="slide-count" aria-live="polite">
-                    {media.serie.indexOf(media.src) + 1} / {media.serie.length}
-                  </span>
                 </>
               )}
             </div>
