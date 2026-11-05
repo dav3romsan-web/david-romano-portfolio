@@ -472,14 +472,6 @@ h2 .outline,
   height: 100%;
   object-fit: cover;
 }
-.rotated-note {
-  position: absolute;
-  right: -4px;
-  top: 20px;
-  writing-mode: vertical-rl;
-  font-size: 9px;
-  letter-spacing: 2px;
-}
 .about-copy h2 {
   margin-bottom: 30px;
 }
@@ -1793,41 +1785,29 @@ dialog video {
   color: var(--contact-ink);
 }
 .contact::before { animation-delay: -5s; }
-.watercolor-field {
+.ambient-lines {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   z-index: -1;
-  overflow: visible;
   pointer-events: none;
 }
-.watercolor-cloud {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: watercolor-flow 9s ease-in-out infinite;
+.flux-lines-container {
+  position: absolute;
+  overflow: hidden;
 }
-.watercolor-cloud-two {
-  animation-name: watercolor-return;
-  animation-duration: 11s;
-  animation-delay: -7s;
+.flux-lines-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
-.contact .watercolor-cloud-one { animation-delay: -4s; }
-.contact .watercolor-cloud-two { animation-delay: -10s; }
 @keyframes red-current {
   0%, 100% { transform: translate(-10%, -7%) rotate(-9deg) scale(1.12); }
   33% { transform: translate(12%, 8%) rotate(11deg) scale(1.18); }
   66% { transform: translate(-5%, 12%) rotate(-5deg) scale(1.14); }
-}
-@keyframes watercolor-flow {
-  0%, 100% { transform: translate(-12%, -15%) rotate(-16deg) skewX(-8deg) scale(0.85, 1.12); }
-  33% { transform: translate(48%, 18%) rotate(16deg) skewX(10deg) scale(1.4, 0.8); }
-  66% { transform: translate(18%, 40%) rotate(-8deg) skewX(-4deg) scale(1.1, 1.35); }
-}
-@keyframes watercolor-return {
-  0%, 100% { transform: translate(12%, 10%) rotate(10deg) scale(1.12, 0.9); }
-  40% { transform: translate(-48%, -35%) rotate(-16deg) skewY(10deg) scale(0.8, 1.4); }
-  75% { transform: translate(-10%, 12%) rotate(4deg) scale(1.2, 1.05); }
 }
 /* Se conserva una superficie legible sobre el color en movimiento. */
 .about-copy > p:not(.lead) { color: var(--ink); }
@@ -1839,15 +1819,14 @@ dialog video {
 }
 .contact > .section-label { padding: 16px; }
 .contact-bottom > p { padding: 16px 20px; align-self: flex-start; }
-.motion-ready [data-ambient]:not(.visible)::before,
-.motion-ready [data-ambient]:not(.visible) .watercolor-cloud {
+.motion-ready [data-ambient]:not(.visible)::before {
   animation-play-state: paused;
 }
 @media (max-width: 760px) {
   .about::after {
     background: linear-gradient(180deg, #00000010 10%, #00000080 45%, #000000b3 100%);
   }
-  .watercolor-field { opacity: 0.85; }
+  .ambient-lines { opacity: 0.85; }
 }
 .contact .section-label > span:first-child,
 .contact .section-label > svg { color: var(--contact-ink); }
@@ -1898,7 +1877,6 @@ h2 { font-size: clamp(68px, 8.4vw, 122px); }
 .tool h3 { font-size: clamp(26px, 2.5vw, 34px); }
 .tool p { font-size: 16px; }
 .collection-note { font-size: 12px; line-height: 1.6; }
-.rotated-note { font-size: 11px; }
 .empty-caption { flex-wrap: wrap; font-size: 14px; line-height: 1.5; }
 .empty-caption > span:last-child { font-size: 12px; }
 .art-two > span:last-child { font-size: 14px; letter-spacing: 1px; }
@@ -2044,4 +2022,96 @@ h2 { font-size: clamp(68px, 8.4vw, 122px); }
 .contact-links > a:focus-visible {
   background: #111;
   border-color: var(--red);
+}
+
+/* Fotografías: resplandor rojo sutil, sombra difusa y bordes superior/inferior difuminados. */
+.portrait-wrap {
+  filter:
+    drop-shadow(0 0 26px rgb(255 0 0 / 0.2))
+    drop-shadow(12px 10px 22px rgb(0 0 0 / 0.38));
+}
+.hero-portrait {
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 100%;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 11%, #000 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 11%, #000 84%, transparent 100%);
+}
+.photo-glow {
+  filter:
+    drop-shadow(0 0 22px rgb(255 0 0 / 0.35))
+    drop-shadow(0 18px 30px rgb(0 0 0 / 0.4));
+}
+/* Sobre mí: recorte sin fondo integrado directamente con la sección. */
+.photo-frame.has-photo {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  overflow: visible;
+  transform: none;
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent 0%, #000 8%, #000 86%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to bottom, transparent 0%, #000 8%, #000 86%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* Herramientas: sombra exterior más visible detrás de cada logotipo. */
+.tool-icon img {
+  filter:
+    drop-shadow(0 8px 14px rgb(0 0 0 / 0.42))
+    drop-shadow(0 2px 4px rgb(0 0 0 / 0.3));
+}
+.tool-icon.capcut {
+  box-shadow:
+    0 10px 22px rgb(0 0 0 / 0.42),
+    0 2px 6px rgb(0 0 0 / 0.3);
+}
+.tool-icon.capcut img {
+  filter: none;
+}
+
+/* Sobre mí: sin la frase vertical, la fotografía queda centrada en su columna. */
+.about-visual { padding: 20px 0; }
+
+/* Encabezados numerados: recuadro rojo minimalista con mayor presencia. */
+.section-label { align-items: center; }
+.section-label > .section-number,
+.contact .section-label > .section-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.4em;
+  padding: 0.5em 0.8em;
+  border: 1.5px solid #ff0000;
+  border-radius: 6px;
+  background: transparent;
+  color: #ff0000;
+  font-size: 1.6em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 14px rgb(255 0 0 / 0.18);
+}
+.motion-ready .section-label.visible > .section-number {
+  animation: number-frame-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes number-frame-in {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+    box-shadow: 0 0 0 rgb(255 0 0 / 0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 14px rgb(255 0 0 / 0.18);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-ready .section-label.visible > .section-number { animation: none; }
 }

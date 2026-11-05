@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   ArrowDown,
   ArrowUp,
@@ -10,6 +10,7 @@ import {
   MessageCircle,
 } from 'lucide-react'
 import { site, pageMeta } from '../lib/site'
+import FluxLines from '../components/FluxLines'
 import {
   trabajosGraficos,
   trabajosAudiovisuales,
@@ -20,35 +21,38 @@ export const Route = createFileRoute('/')({
   head: () => pageMeta('Portafolio', site.description),
 })
 type Media = { title: string; src: string; video?: boolean }
-function WatercolorBackground() {
-  const pigmentFilter = useId()
+function AnimatedBackground() {
+  const [light, setLight] = useState(false)
+  useEffect(() => {
+    const root = document.documentElement
+    const sync = () => setLight(root.dataset.theme === 'claro')
+    sync()
+    const observer = new MutationObserver(sync)
+    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => observer.disconnect()
+  }, [])
+  const tone = light ? '#000000' : '#ffffff'
   return (
-    <svg
-      className="watercolor-field"
-      viewBox="0 0 1200 800"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-      focusable="false"
-      fill="white"
-    >
-      <defs>
-        <filter id={pigmentFilter} x="-30%" y="-30%" width="160%" height="160%" colorInterpolationFilters="sRGB">
-          <feTurbulence type="fractalNoise" baseFrequency="0.014" numOctaves="2" seed="8" result="grain" />
-          <feDisplacementMap in="SourceGraphic" in2="grain" scale="38" xChannelSelector="R" yChannelSelector="G" />
-          <feGaussianBlur stdDeviation="5" />
-        </filter>
-      </defs>
-      <g className="watercolor-cloud watercolor-cloud-one" filter={`url(#${pigmentFilter})`}>
-        <path opacity="0.24" d="M-140 220C-30 50 160 180 240 100S460 50 500 180 380 310 440 410 260 540 130 460-240 420-140 220Z" />
-        <path opacity="0.32" d="M-90 235C10 100 140 230 250 155S400 130 410 225 295 315 340 395 190 445 100 400-170 380-90 235Z" />
-        <path opacity="0.15" d="M-40 250C40 170 130 265 240 210S335 200 325 270 210 340 240 375 130 370 70 340-100 335-40 250Z" />
-      </g>
-      <g className="watercolor-cloud watercolor-cloud-two" filter={`url(#${pigmentFilter})`}>
-        <path opacity="0.25" d="M760 480C860 330 960 470 1090 360S1330 400 1300 530 1120 600 1160 720 920 850 820 740 650 650 760 480Z" />
-        <path opacity="0.34" d="M810 510C880 410 980 520 1090 430S1240 465 1220 550 1060 620 1100 700 950 755 870 685 740 620 810 510Z" />
-        <path opacity="0.13" d="M870 530C940 480 1010 560 1100 495S1180 520 1150 565 1010 635 1030 675 930 685 905 630 820 575 870 530Z" />
-      </g>
-    </svg>
+    <FluxLines
+      className="ambient-lines"
+      colors={[tone, tone, tone]}
+      glow={2}
+      rimWidth={0.2}
+      lineWidth={1}
+      flowDirection="down"
+      mouseInteraction
+      clickSwirl
+      speed={0.5}
+      scale={1.2}
+      turbulence={1}
+      fluidity={0.1}
+      sharpness={2.5}
+      shimmer={1.5}
+      mouseStrength={1}
+      mouseRadius={0.35}
+      intro
+      lightMode={light}
+    />
   )
 }
 function SectionLabel({
@@ -60,7 +64,7 @@ function SectionLabel({
 }) {
   return (
     <div className="section-label" data-reveal>
-      <span>/{number}</span>
+      <span className="section-number">/{number}</span>
       <span>{children}</span>
       <Plus size={14} />
     </div>
@@ -146,7 +150,7 @@ function PortfolioHome() {
             <p>
               DAVID
               <br />
-              ROMANO
+              <span>ROMANO</span>
               <br />
               <span>SÁNCHEZ.</span>
             </p>
@@ -194,21 +198,22 @@ function PortfolioHome() {
         </div>
       </section>
       <section id="sobre-mi" className="section about" data-ambient>
-        <WatercolorBackground />
+        <AnimatedBackground />
         <SectionLabel number="01">UN POCO DE MÍ</SectionLabel>
         <div className="about-grid">
           <div className="about-visual" data-reveal>
-            <div className="photo-frame has-photo">
-              <img
-                src={segundaFotografia}
-                alt="David Romano Sánchez con camiseta blanca y negra, al aire libre"
-                width={783}
-                height={1280}
-                loading="lazy"
-                decoding="async"
-              />
+            <div className="photo-glow">
+              <div className="photo-frame has-photo">
+                <img
+                  src={`/.netlify/images?url=${segundaFotografia}&w=1400&fm=webp&q=100`}
+                  alt="David Romano Sánchez con buzo negro y blanco"
+                  width={2657}
+                  height={4344}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
             </div>
-            <span className="rotated-note">DE LA IDEA A LA EXPRESIÓN.</span>
           </div>
           <div className="about-copy" data-reveal>
             <h2>
@@ -460,7 +465,7 @@ function PortfolioHome() {
         </div>
       </section>
       <section id="contacto" className="section contact" data-ambient>
-        <WatercolorBackground />
+        <AnimatedBackground />
         <SectionLabel number="05">LA PRÓXIMA IDEA EMPIEZA ACÁ</SectionLabel>
         <div className="contact-title" data-reveal>
           <h2>

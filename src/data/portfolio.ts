@@ -15,4 +15,4 @@ export type VideoWork = {
 }
 export const trabajosGraficos: GraphicWork[] = []
 export const trabajosAudiovisuales: VideoWork[] = []
-export const segundaFotografia = '/img/david-sobre-mi.jpg'
+export const segundaFotografia = '/img/david-sobre-mi.png'
