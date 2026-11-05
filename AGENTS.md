@@ -5,6 +5,7 @@ Este sitio es el portafolio de David Romano Sánchez. Es una sola página con ex
 ## Archivos principales
 
 - `src/routes/index.tsx`: seis secciones, animaciones de visibilidad y diálogo para imágenes/videos.
+- `src/components/FluxLines.tsx`: fondo animado WebGL2 de Sobre mí y Contacto; líneas blancas en tema oscuro y negras en tema claro.
 - `src/components/SiteHeader.tsx`: navegación por anclas, estado de sección activa, menú móvil y selector de tema.
 - `src/routes/__root.tsx`: documento en español, metadatos, inicialización del tema y estructura accesible.
 - `src/styles.css`: identidad visual, variables de temas, tipografía, adaptación móvil y movimiento reducido.
@@ -15,7 +16,7 @@ Este sitio es el portafolio de David Romano Sánchez. Es una sola página con ex
 
 ## Decisiones
 
-Todo el texto visible debe estar en español, excepto los nombres oficiales de programas y marcas. No inventar trabajos ni presentar los espacios tipográficos pendientes como proyectos. Nunca publicar el video de referencia: solo inspira el diseño. La segunda fotografía recibida se encuentra en `public/img/david-sobre-mi.jpg` y se utiliza exclusivamente en Sobre mí, conservando el archivo original.
+Todo el texto visible debe estar en español, excepto los nombres oficiales de programas y marcas. No inventar trabajos ni presentar los espacios tipográficos pendientes como proyectos. Nunca publicar el video de referencia: solo inspira el diseño. La segunda fotografía recibida se encuentra en `public/img/david-sobre-mi.png` y se utiliza exclusivamente en Sobre mí, conservando el archivo original.
 
 Los temas solo cambian variables cromáticas. Su preferencia se almacena en localStorage como preferencia local del navegador. No hay datos de aplicación persistentes, autenticación ni formularios de contacto: el contacto usa los enlaces autorizados.
 
