@@ -4,6 +4,9 @@ import {
   ArrowDown,
   ArrowUp,
   ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
   Plus,
   Play,
   X,
@@ -21,7 +24,7 @@ export const Route = createFileRoute('/')({
   component: PortfolioHome,
   head: () => pageMeta('Portafolio', site.description),
 })
-type Media = { title: string; src: string; video?: boolean }
+type Media = { title: string; src: string; video?: boolean; serie?: string[] }
 function AnimatedBackground() {
   const [light, setLight] = useState(false)
   useEffect(() => {
@@ -74,6 +77,22 @@ function SectionLabel({
 function PortfolioHome() {
   const [media, setMedia] = useState<Media | null>(null)
   const dialog = useRef<HTMLDialogElement>(null)
+  const moverSerie = (paso: number) =>
+    setMedia((m) => {
+      if (!m?.serie) return m
+      const n = m.serie.length
+      const i = (m.serie.indexOf(m.src) + paso + n) % n
+      return { ...m, src: m.serie[i] }
+    })
+  useEffect(() => {
+    if (!media?.serie) return
+    const tecla = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') moverSerie(-1)
+      if (e.key === 'ArrowRight') moverSerie(1)
+    }
+    window.addEventListener('keydown', tecla)
+    return () => window.removeEventListener('keydown', tecla)
+  }, [media?.serie])
   useEffect(() => {
     if (!('IntersectionObserver' in window)) return
     const observer = new IntersectionObserver(
@@ -334,25 +353,57 @@ function PortfolioHome() {
         </div>
         <div className="graphic-gallery">
           {trabajosGraficos.length ? (
-            trabajosGraficos.map((work) => (
-              <button
-                data-reveal
-                className={'work ' + work.formato}
-                key={work.imagen}
-                onClick={() =>
-                  setMedia({ title: work.titulo, src: work.imagen })
-                }
-              >
-                <img loading="lazy" src={work.imagen} alt={work.titulo} />
-                <span className="work-caption">
-                  <span>
-                    {work.titulo}
-                    <small>{work.categoria}</small>
+            trabajosGraficos.map((work) => {
+              if (work.tipo === 'pdf')
+                return (
+                  <a
+                    data-reveal
+                    className="work pdf-work"
+                    key={work.archivo}
+                    href={work.archivo}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <span className="pdf-cover">
+                      <FileText size={34} />
+                      <b>{work.marca}</b>
+                      <small>PDF</small>
+                    </span>
+                    <span className="work-caption">
+                      <span>{work.titulo}</span>
+                      <ArrowUpRight />
+                    </span>
+                  </a>
+                )
+              const portada =
+                work.tipo === 'serie' ? work.imagenes[0] : work.imagen
+              return (
+                <button
+                  data-reveal
+                  className="work"
+                  key={portada}
+                  onClick={() =>
+                    setMedia({
+                      title: work.titulo,
+                      src: portada,
+                      serie: work.tipo === 'serie' ? work.imagenes : undefined,
+                    })
+                  }
+                >
+                  <img loading="lazy" src={portada} alt={work.titulo} />
+                  <span className="work-caption">
+                    <span>{work.titulo}</span>
+                    {work.tipo === 'serie' ? (
+                      <small className="serie-count">
+                        1 / {work.imagenes.length}
+                      </small>
+                    ) : (
+                      <ArrowUpRight />
+                    )}
                   </span>
-                  <ArrowUpRight />
-                </span>
-              </button>
-            ))
+                </button>
+              )
+            })
           ) : (
             <>
               <div className="empty-work large" data-reveal>
@@ -415,7 +466,7 @@ function PortfolioHome() {
           }
         >
           {trabajosAudiovisuales.length ? (
-            trabajosAudiovisuales.map((work, i) => (
+            trabajosAudiovisuales.map((work) => (
               <VideoPlayer
                 key={work.video}
                 src={work.video}
@@ -423,7 +474,6 @@ function PortfolioHome() {
                 titulo={work.titulo}
                 categoria={work.categoria}
                 formato={work.formato}
-                numero={String(i + 1).padStart(2, '0')}
               />
             ))
           ) : (
@@ -613,7 +663,30 @@ function PortfolioHome() {
               aria-label={media.title}
             />
           ) : (
-            <img src={media.src} alt={media.title} />
+            <div className="modal-slide">
+              <img key={media.src} src={media.src} alt={media.title} />
+              {media.serie && media.serie.length > 1 && (
+                <>
+                  <button
+                    className="slide-arrow prev"
+                    aria-label="Imagen anterior"
+                    onClick={() => moverSerie(-1)}
+                  >
+                    <ChevronLeft />
+                  </button>
+                  <button
+                    className="slide-arrow next"
+                    aria-label="Imagen siguiente"
+                    onClick={() => moverSerie(1)}
+                  >
+                    <ChevronRight />
+                  </button>
+                  <span className="slide-count" aria-live="polite">
+                    {media.serie.indexOf(media.src) + 1} / {media.serie.length}
+                  </span>
+                </>
+              )}
+            </div>
           ))}
       </dialog>
     </>
