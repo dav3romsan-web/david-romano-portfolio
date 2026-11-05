@@ -847,7 +847,7 @@ h2 .outline,
   background: #000;
   cursor: pointer;
 }
-.video-work:not(.enhanced) video {
+.video-work:not([data-enhanced]) video {
   cursor: auto;
 }
 .video-item {
@@ -1158,11 +1158,41 @@ dialog video {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   padding-bottom: 20px;
 }
 .modal-top button {
   background: transparent;
   padding: 7px;
+}
+/* Vista ampliada de Diseño gráfico: ocupa casi toda la pantalla */
+dialog.lightbox {
+  width: 96vw;
+  height: 94vh;
+  height: 94dvh;
+  max-width: 96vw;
+  max-height: 94dvh;
+  padding: 14px 18px 18px;
+  overflow: hidden;
+}
+dialog.lightbox[open] {
+  display: flex;
+  flex-direction: column;
+}
+dialog.lightbox::backdrop {
+  background: #000e;
+}
+.lightbox .modal-top {
+  flex: none;
+  padding-bottom: 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 .sr-only {
   position: absolute;
@@ -2328,13 +2358,35 @@ h2 { font-size: clamp(68px, 8.4vw, 122px); }
 }
 .modal-slide {
   position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 64px;
+  touch-action: pan-y;
+}
+.lightbox .modal-slide img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+.motion-ready .lightbox .modal-slide img {
+  animation: slide-in 0.3s ease;
+}
+@keyframes slide-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .slide-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -2343,24 +2395,380 @@ h2 { font-size: clamp(68px, 8.4vw, 122px); }
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 16px #0006;
+  transition: transform 0.2s;
+}
+.slide-arrow:hover {
+  transform: translateY(-50%) scale(1.08);
 }
 .slide-arrow:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
 }
-.slide-arrow.prev { left: 8px; }
-.slide-arrow.next { right: 8px; }
+.slide-arrow.prev { left: 0; }
+.slide-arrow.next { right: 0; }
 .slide-count {
-  display: block;
-  text-align: center;
-  margin-top: 12px;
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: 1px;
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 640px) {
+  dialog.lightbox {
+    width: 100vw;
+    max-width: 100vw;
+    padding: 10px 10px 14px;
+  }
+  .modal-slide { padding: 0; }
+  .slide-arrow {
+    width: 42px;
+    height: 42px;
+    background: color-mix(in srgb, var(--red) 88%, transparent);
+  }
+  .slide-arrow.prev { left: 4px; }
+  .slide-arrow.next { right: 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-ready .lightbox .modal-slide img { animation: none; }
+  .slide-arrow { transition: none; }
 }
 @media (max-width: 900px) {
   .graphic-gallery:has(.work) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 480px) {
   .graphic-gallery:has(.work) { grid-template-columns: 1fr; }
+}
+
+/* Diseño gráfico: carpetas por categoría */
+.graphic {
+  overflow-x: clip;
+}
+.graphic-folders {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px 20px;
+}
+.folder-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-top: 1px solid var(--line);
+}
+.folder-card[data-abierta] {
+  z-index: 20;
+}
+.folder-card-stage {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 60px 0 34px;
+}
+.folder-card-stage .folder-tab-text {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.folder-card-stage .folder-item {
+  background: #fff;
+}
+.folder-card-info {
+  display: grid;
+  gap: 8px;
+}
+.folder-card-index {
+  color: var(--red);
+  font-size: 10px;
+  letter-spacing: 1.6px;
+}
+.folder-card-info h3 {
+  margin: 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+.folder-card-info p {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.folder-card-count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 9px;
+  letter-spacing: 1.4px;
+  color: var(--ink);
+}
+.folder-card-fallback {
+  margin: 6px 0 0;
+  padding-left: 16px;
+  font-size: 12px;
+}
+.folder-card-fallback a {
+  color: var(--ink);
+}
+
+/* Selector de imágenes de la carpeta abierta */
+.folder-picker {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.folder-picker-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 9px;
+  letter-spacing: 1.4px;
+}
+.folder-picker-top button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  padding: 4px 0;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+.folder-picker-top button:hover { color: var(--red); }
+.folder-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+  gap: 8px;
+}
+.folder-thumb {
+  position: relative;
+  padding: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+.folder-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+.folder-thumb span {
+  position: absolute;
+  left: 5px;
+  bottom: 4px;
+  padding: 1px 5px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #fff;
+  background: var(--red);
+}
+.folder-thumb:hover,
+.folder-thumb:focus-visible { border-color: var(--red); }
+.folder-thumb:hover img { transform: scale(1.06); }
+.folder-thumb:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .folder-thumb img { transition: none; }
+}
+/* Carpeta seleccionada: permanece visible y se resalta */
+.folder-card-stage .folder-root {
+  transition: filter 0.3s, transform 0.3s;
+}
+.folder-card[data-abierta] .folder-card-stage .folder-root {
+  filter: drop-shadow(0 0 22px rgb(255 0 0 / 0.45));
+  transform: translateY(-4px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .folder-card-stage .folder-root { transition: none; }
+  .folder-card[data-abierta] .folder-card-stage .folder-root { transform: none; }
+}
+/* Cuatro carpetas siempre visibles + panel de trabajos debajo */
+.folder-card { align-items: center; text-align: center; }
+.folder-card-info { justify-items: center; }
+.folder-card-count { justify-content: center; }
+.folder-card .folder-stage { cursor: pointer; }
+.folder-card[data-abierta] .folder-card-info h3 { color: var(--red); }
+.folder-panel {
+  margin-top: 40px;
+  padding: 26px;
+  border: 1px solid var(--red);
+  background: var(--surface);
+  animation: panel-in 0.35s ease;
+}
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.folder-panel-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.folder-panel-top h3 {
+  margin: 0 0 6px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(24px, 2.4vw, 34px);
+  font-weight: 700;
+  line-height: 1;
+}
+.folder-panel-top p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.folder-panel-top button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 8px 12px;
+  font-size: 9px;
+  letter-spacing: 1.4px;
+  cursor: pointer;
+}
+.folder-panel-top button:hover { border-color: var(--red); color: var(--red); }
+.folder-panel-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 9px;
+  letter-spacing: 1.4px;
+}
+.folder-panel .folder-picker-grid {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.folder-panel .folder-thumb { aspect-ratio: 4 / 5; }
+.folder-panel-empty { margin: 0; color: var(--muted); font-size: 14px; }
+@media (max-width: 1100px) {
+  .graphic-folders { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .graphic-folders { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 10px; }
+  .folder-card-stage { padding: 40px 0 18px; }
+  .folder-card-info h3 { font-size: 17px; }
+  .folder-panel { margin-top: 26px; padding: 16px; }
+  .folder-panel .folder-picker-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .folder-panel { animation: none; }
+}
+
+/* ==========================================================================
+   Adaptación responsive integral.
+   Solo ajusta medidas, espacios y distribución: no cambia colores, efectos,
+   animaciones, sombras, degradados ni fondos.
+   ========================================================================== */
+
+/* Sin desplazamiento horizontal accidental en ningún dispositivo. */
+body { overflow-x: clip; }
+img,
+video { max-width: 100%; }
+h1, h2, h3, p, small { overflow-wrap: break-word; }
+
+/* Carpetas: el escenario ocupa toda la columna para medir su ancho real. */
+.folder-card-stage {
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+}
+.folder-card-info { max-width: 100%; }
+.folder-card-info h3 { overflow-wrap: anywhere; }
+
+/* Reproductor: los controles se compactan cuando la tarjeta es angosta
+   (por ejemplo, cuatro videos por fila en notebooks), sin cortar el tiempo. */
+.video-work { container-type: inline-size; }
+@container (max-width: 270px) {
+  .video-controls { padding: 30px 8px 8px; }
+  .video-buttons { gap: 3px; }
+  .video-buttons button { width: 32px; height: 32px; }
+  .video-buttons button svg { width: 16px; height: 16px; }
+  .video-time { font-size: 10px; letter-spacing: 0; padding-right: 2px; }
+}
+
+/* Notebooks y tablets horizontales: navegación sin desbordes. */
+@media (min-width: 761px) and (max-width: 1000px) {
+  .site-header { gap: 18px; }
+  .navigation { gap: 12px; }
+  .navigation a { font-size: 12px; }
+}
+
+/* Tablets: encabezados de sección apilados con aire suficiente. */
+@media (min-width: 761px) and (max-width: 900px) {
+  .section-heading { flex-wrap: wrap; }
+  .section-heading p { min-width: 0; }
+  .contact-title h2 { font-size: clamp(64px, 11vw, 104px); }
+}
+
+/* Celulares: tipografías fluidas para que los titulares entren completos. */
+@media (max-width: 760px) {
+  .about-copy h2 { font-size: clamp(48px, 19vw, 82px); }
+  .contact-title h2 { font-size: clamp(40px, 14.5vw, 104px); }
+  .contact-title::before { inset: -12px -10px; }
+  .section-heading p { min-width: 0; }
+  .lead { font-size: clamp(26px, 8vw, 32px); }
+  .lightbox .modal-top { font-size: 15px; }
+  .lightbox .modal-top > span { min-width: 0; overflow-wrap: anywhere; }
+  .folder-panel-top { flex-wrap: wrap; }
+}
+
+/* Celulares chicos (≤ 420 px). */
+@media (max-width: 420px) {
+  .site-header { padding: 0 5%; gap: 10px; }
+  .wordmark { font-size: 34px; }
+  .header-actions { gap: 12px; }
+  .hero,
+  .section { padding-left: 5%; padding-right: 5%; }
+  .hero-topline { font-size: 9px; gap: 10px; }
+  .hero-name > p { font-size: clamp(52px, 16vw, 68px); }
+  .hero-role { font-size: 19px; }
+  .hero-note > p { font-size: 22px; }
+  .section-heading h2 { font-size: clamp(46px, 13vw, 58px); }
+  .tools h2 { font-size: clamp(36px, 11.5vw, 48px); }
+  .tool-list { gap: 10px; }
+  .tool,
+  .tool:first-child,
+  .tool:last-child { padding: 20px 10px !important; }
+  .tool-icon { width: 58px; height: 58px; margin-bottom: 16px; }
+  .tool h3 { font-size: clamp(17px, 5vw, 21px); }
+  .tool p { font-size: 13px; }
+  .interests > div { gap: 8px; }
+  .interests > div span { font-size: 13px; padding: 8px 10px; }
+  .graphic-folders { gap: 14px 8px; }
+  .folder-card-info h3 { font-size: 15px; }
+  .folder-card-count { font-size: 8px; letter-spacing: 1px; }
+  .folder-panel { padding: 14px 12px; }
+  .contact-links small { font-size: 14px; }
+  .footer-top,
+  .footer-bottom { gap: 14px; }
+}
+
+/* Teléfonos en horizontal: la vista ampliada aprovecha la poca altura. */
+@media (max-height: 500px) and (orientation: landscape) {
+  dialog.lightbox { height: 98dvh; max-height: 98dvh; padding: 8px 12px 10px; }
+  .lightbox .modal-top { padding-bottom: 6px; }
+}
+
+/* Pantallas grandes: el contenido no se estira de más. */
+@media (min-width: 1800px) {
+  .folder-panel .folder-picker-grid {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  }
 }

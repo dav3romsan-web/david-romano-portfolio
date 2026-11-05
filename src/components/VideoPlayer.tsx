@@ -133,7 +133,10 @@ export default function VideoPlayer({
     <figure className={'video-item ' + formato}>
       <article
         ref={contenedor}
-        className={'video-work ' + formato + (mejorado ? ' enhanced' : '')}
+        // El estado va en un atributo: cambiar className borraría la clase
+        // «visible» de la animación de entrada y ocultaría el video.
+        className={'video-work ' + formato}
+        data-enhanced={mejorado ? '' : undefined}
         data-reveal
       >
         <video
