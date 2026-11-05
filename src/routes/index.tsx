@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { site, pageMeta } from '../lib/site'
 import FluxLines from '../components/FluxLines'
+import VideoPlayer from '../components/VideoPlayer'
 import {
   trabajosGraficos,
   trabajosAudiovisuales,
@@ -408,25 +409,22 @@ function PortfolioHome() {
             Otra forma de mirar y de contar.
           </p>
         </div>
-        <div className="video-gallery">
+        <div
+          className={
+            'video-gallery' + (trabajosAudiovisuales.length ? ' has-works' : '')
+          }
+        >
           {trabajosAudiovisuales.length ? (
-            trabajosAudiovisuales.map((work) => (
-              <button
-                data-reveal
-                className={'video-work ' + work.formato}
+            trabajosAudiovisuales.map((work, i) => (
+              <VideoPlayer
                 key={work.video}
-                onClick={() =>
-                  setMedia({ title: work.titulo, src: work.video, video: true })
-                }
-              >
-                <img src={work.miniatura} alt={work.titulo} loading="lazy" />
-                <span className="play-circle">
-                  <Play fill="currentColor" />
-                </span>
-                <span className="video-caption">
-                  {work.titulo} · {work.categoria}
-                </span>
-              </button>
+                src={work.video}
+                poster={work.miniatura}
+                titulo={work.titulo}
+                categoria={work.categoria}
+                formato={work.formato}
+                numero={String(i + 1).padStart(2, '0')}
+              />
             ))
           ) : (
             <>
