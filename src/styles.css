@@ -2730,6 +2730,147 @@ h2 { font-size: clamp(68px, 8.4vw, 122px); }
   --contact-ink: #181818;
 }
 
+/* Los acentos acompañan el texto y reservan su propio espacio. */
+.section-detail {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 1em;
+  height: 1em;
+  color: #ff0000;
+  font: 400 var(--detail-size, 68px)/1 'DM Sans', sans-serif;
+  letter-spacing: 0;
+  pointer-events: none;
+  user-select: none;
+}
+h2 > .section-detail {
+  margin-left: 0.2em;
+  vertical-align: middle;
+}
+/* Tres títulos reservan una columna para su acento superior derecho.
+   La separación incluye el pequeño recorrido de las animaciones. */
+h2.title-corner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: var(--corner-gap, 20px);
+  width: fit-content;
+  max-width: 100%;
+}
+.title-corner > .title-copy { min-width: 0; }
+h2.title-corner > .section-detail {
+  margin-left: 0;
+  margin-top: var(--corner-offset, 6px);
+  align-self: start;
+}
+.graphic { --corner-gap: 24px; --corner-offset: 2px; }
+.videos { --corner-gap: 18px; --corner-offset: 10px; }
+.decorated-copy {
+  position: relative;
+  padding-right: calc(var(--detail-top-size, 72px) + 20px);
+}
+.decorated-copy > .section-detail {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  margin-top: -0.5em;
+  font-size: var(--detail-top-size, 72px);
+}
+/* Contacto reserva el lateral del párrafo para el asterisco, incluso
+   frente al padding propio de su placa. El margen cubre también el giro. */
+.contact-bottom > .decorated-copy {
+  padding-right: calc(var(--contact-copy-accent-size, 72px) + 40px);
+}
+.contact-bottom > .decorated-copy > .section-detail {
+  right: 20px;
+}
+.about {
+  --detail-size: 64px;
+  --detail-top-size: 80px;
+}
+.tools {
+  --detail-size: 80px;
+  --detail-top-size: 64px;
+}
+.graphic {
+  --detail-size: 60px;
+  --detail-top-size: 76px;
+}
+.videos {
+  --detail-size: 72px;
+  --detail-top-size: 68px;
+}
+.contact {
+  --detail-size: 56px;
+  --detail-top-size: 72px;
+}
+.section-detail > span { display: block; }
+.motion-ready .section-detail[data-reveal] {
+  transform: translateY(9px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+.motion-ready .section-detail[data-reveal].visible {
+  transform: translateY(0);
+}
+.motion-ready .section-detail.visible > span {
+  animation: detail-float 6s ease-in-out infinite;
+}
+.motion-ready .tools .section-detail.visible > span,
+.motion-ready .contact .section-detail.visible > span {
+  animation: detail-glide 1.6s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.motion-ready .section-detail[data-ubicacion='texto'].visible > span,
+.motion-ready .hero-note.visible > .asterisk {
+  animation: detail-turn 1.8s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.motion-ready .hero-orbit.visible::after {
+  animation: detail-float 7s ease-in-out infinite;
+}
+@keyframes detail-turn {
+  from { transform: rotate(-45deg) scale(0.8); opacity: 0; }
+  to { transform: rotate(0) scale(1); opacity: 1; }
+}
+@keyframes detail-float {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-4px) rotate(5deg); }
+}
+@keyframes detail-glide {
+  from { transform: translateX(-10px) rotate(-12deg); opacity: 0; }
+  to { transform: translateX(0) rotate(0); opacity: 1; }
+}
+/* Inicio conserva sus anclajes y animaciones de entrada. */
+.hero-note > .asterisk {
+  font-size: clamp(82px, 7vw, 104px);
+  margin-bottom: 12px;
+}
+.hero-orbit::after {
+  font-size: 54px;
+  line-height: 1;
+}
+@media (max-width: 760px) {
+  .contact-bottom > .decorated-copy {
+    --contact-copy-accent-size: clamp(38px, 10vw, 48px);
+  }
+  h2.title-corner { column-gap: 14px; }
+  h2.title-corner > .section-detail {
+    font-size: clamp(30px, 8vw, 42px);
+    margin-top: 4px;
+  }
+  h2 > .section-detail {
+    font-size: clamp(40px, 11vw, 50px);
+  }
+  .decorated-copy {
+    padding-right: calc(clamp(38px, 10vw, 48px) + 16px);
+  }
+  .decorated-copy > .section-detail {
+    font-size: clamp(38px, 10vw, 48px);
+  }
+  .hero-orbit::after { font-size: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-ready .section-detail[data-reveal] { transform: none; }
+}
+
 /* ==========================================================================
    Adaptación responsive integral.
    Solo ajusta medidas, espacios y distribución: no cambia colores, efectos,
