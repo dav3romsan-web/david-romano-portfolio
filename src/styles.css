@@ -1428,7 +1428,7 @@ dialog.lightbox::backdrop {
     aspect-ratio: 1;
   }
   .portrait-wrap {
-    left: 17%;
+    left: 5%;
     width: 90%;
     height: 80%;
     bottom: 8px;
@@ -2770,5 +2770,22 @@ h1, h2, h3, p, small { overflow-wrap: break-word; }
 @media (min-width: 1800px) {
   .folder-panel .folder-picker-grid {
     grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  }
+}
+
+/* Celulares: fotografía de Inicio algo más grande y cerca de PORTAFOLIO.
+   La caja conserva la proporción de la imagen (2896 × 2712) y la segunda
+   fila de la grilla termina donde termina la foto, sin superponer el texto. */
+@media (max-width: 760px) {
+  .hero-stage {
+    grid-template-rows: 115px calc(98vw - 91px) auto auto;
+  }
+  .portrait-wrap {
+    top: calc(24px + 5vw);
+    bottom: auto;
+    left: -5%;
+    width: 110%;
+    height: auto;
+    aspect-ratio: 2896 / 2712;
   }
 }
