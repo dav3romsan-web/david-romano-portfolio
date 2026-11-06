@@ -103,6 +103,33 @@ export const trabajosGraficos: GraphicWork[] = [
   {
     tipo: 'serie',
     categoria: 'identidad',
+    titulo: 'CREDS DESIGN',
+    // Orden original de los archivos recibidos: 9.png a 14.png.
+    imagenes: [
+      '/trabajos/graficos/creds-identidad-01.png',
+      '/trabajos/graficos/creds-identidad-02.png',
+      '/trabajos/graficos/creds-identidad-03.png',
+      '/trabajos/graficos/creds-identidad-04.png',
+      '/trabajos/graficos/creds-identidad-05.png',
+      '/trabajos/graficos/creds-identidad-06.png',
+    ],
+  },
+  {
+    tipo: 'serie',
+    categoria: 'identidad',
+    titulo: 'OLIVIUM',
+    // Orden original de los archivos recibidos: 1, 5, 6, 9 y 10.
+    imagenes: [
+      '/trabajos/graficos/olivium-01.png',
+      '/trabajos/graficos/olivium-02.png',
+      '/trabajos/graficos/olivium-03.png',
+      '/trabajos/graficos/olivium-04.png',
+      '/trabajos/graficos/olivium-05.png',
+    ],
+  },
+  {
+    tipo: 'serie',
+    categoria: 'identidad',
     titulo: 'BUBBLY',
     imagenes: [
       '/trabajos/graficos/bubbly-01.png',
