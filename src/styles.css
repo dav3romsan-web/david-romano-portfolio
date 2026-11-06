@@ -561,11 +561,6 @@ h2 .outline,
 .tool:last-child {
   border: 0;
 }
-.tool:hover {
-  transform: translateY(-8px);
-  background: var(--bg);
-  box-shadow: 0 18px 25px #0001;
-}
 .tool-index {
   font-size: 9px;
   color: var(--muted);
@@ -580,9 +575,6 @@ h2 .outline,
   width: 100%;
   height: 100%;
   object-fit: contain;
-}
-.tool:hover .tool-icon {
-  transform: scale(1.08);
 }
 .tool-icon.capcut {
   background: #fff;
@@ -1721,26 +1713,6 @@ dialog.lightbox::backdrop {
   position: relative;
   isolation: isolate;
 }
-.tool-icon::before {
-  content: '';
-  position: absolute;
-  inset: -18px;
-  z-index: -1;
-  background: radial-gradient(circle, var(--tool-light) 0%, transparent 70%);
-  opacity: 0;
-  transform: scale(0.85);
-  transition: opacity 0.45s ease, transform 0.45s ease;
-  pointer-events: none;
-}
-.illustrator { --tool-light: #ff9a0070; }
-.photoshop { --tool-light: #31a8ff70; }
-.indesign { --tool-light: #ff336670; }
-.capcut { --tool-light: #ddd9; }
-.tool:hover .tool-icon::before,
-.tool:active .tool-icon::before {
-  opacity: 1;
-  transform: scale(1.08);
-}
 .contact-bottom {
   flex-direction: column;
   align-items: stretch;
@@ -1756,13 +1728,6 @@ dialog.lightbox::backdrop {
 .contact-links small {
   font-size: 13px;
   overflow-wrap: anywhere;
-}
-@media (hover: none), (pointer: coarse) {
-  .tool.visible .tool-icon::before {
-    opacity: 0.55;
-    transform: scale(1);
-  }
-  .tool.visible .tool-icon { transform: scale(1.04); }
 }
 @media (max-width: 760px) {
   .tools h2 { font-size: clamp(38px, 10.8vw, 80px); }
@@ -1831,10 +1796,6 @@ dialog.lightbox::backdrop {
   text-align: center;
   min-width: 0;
   box-shadow: 0 8px 20px #00000012;
-}
-.tool:hover {
-  box-shadow: 0 18px 30px #00000026;
-  transform: translateY(-6px);
 }
 .tool-index { display: none; }
 .tool > svg { display: none; }
@@ -1990,6 +1951,27 @@ dialog.lightbox::backdrop {
   33% { transform: translate(12%, 8%) rotate(11deg) scale(1.18); }
   66% { transform: translate(-5%, 12%) rotate(-5deg) scale(1.14); }
 }
+/* Fondo blanco y ondas rojas exclusivamente en el tema claro. */
+:root[data-theme='claro'] .about,
+:root[data-theme='claro'] .contact {
+  background: #fff;
+}
+:root[data-theme='claro'] .about::before,
+:root[data-theme='claro'] .contact::before {
+  background:
+    radial-gradient(ellipse at 20% 25%, #fff 8%, #fff 28%, transparent 60%),
+    radial-gradient(ellipse at 80% 70%, #fff 0%, #fff 24%, transparent 62%),
+    radial-gradient(ellipse at 40% 90%, #fff, transparent 58%);
+}
+:root[data-theme='claro'] .about::after {
+  background: linear-gradient(90deg, #ffffff10 10%, #ffffff70 45%, #ffffffb3 100%);
+}
+@media (max-width: 760px) {
+  :root[data-theme='claro'] .about::after {
+    background: linear-gradient(180deg, #ffffff10 10%, #ffffff80 45%, #ffffffb3 100%);
+  }
+}
+
 /* Se conserva una superficie legible sobre el color en movimiento. */
 .about-copy > p:not(.lead) { color: var(--ink); }
 .contact > .section-label,
@@ -2022,13 +2004,17 @@ dialog.lightbox::backdrop {
   inset: -18px -20px;
   z-index: -1;
   border-radius: 16px;
-  background: linear-gradient(120deg, #210909, #320b0b);
+  background: linear-gradient(120deg, #181818, #101010);
   pointer-events: none;
 }
 .contact-title h2,
 .contact-title .contact-arrow { color: #fff; }
 .contact-title h2 > span { color: var(--red); }
-.contact-links > a { border-color: var(--contact-line); }
+.contact-links > a {
+  background: #181818;
+  color: #fff;
+  border-color: #ffffff40;
+}
 /* Escala de lectura con jerarquía, sin modificar el rótulo PORTAFOLIO. */
 body { font-size: 16px; }
 h2 { font-size: clamp(68px, 8.4vw, 122px); }
@@ -2177,13 +2163,13 @@ h2 { font-size: clamp(68px, 8.4vw, 122px); }
   transition: color 0.35s ease;
 }
 .contact-links > a:hover {
-  background: var(--contact-bg);
-  color: inherit;
+  background: #181818;
+  color: #fff;
   transform: none;
 }
 @media (hover: hover) {
   .contact-links > a:hover {
-    background: #111;
+    background: #080808;
     transform: translateY(-4px);
   }
   .contact-links > a:hover,
@@ -2200,7 +2186,7 @@ h2 { font-size: clamp(68px, 8.4vw, 122px); }
 }
 .contact-links > a:active,
 .contact-links > a:focus-visible {
-  background: #111;
+  background: #080808;
   border-color: var(--red);
 }
 
@@ -2252,6 +2238,60 @@ h2 { font-size: clamp(68px, 8.4vw, 122px); }
 }
 .tool-icon.capcut img {
   filter: none;
+}
+
+/* El mismo halo se activa con cursor, teclado o toque, sin alterar los logotipos. */
+.tool[data-app='illustrator'] { --tool-light: #ff9a00; }
+.tool[data-app='photoshop'] { --tool-light: #31a8ff; }
+.tool[data-app='indesign'] { --tool-light: #ff3366; }
+.tool[data-app='capcut'] { --tool-light: #ddd; }
+.tool {
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+}
+.tool::before,
+.tool-icon::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+  opacity: var(--tool-glow, 0);
+  transition: opacity 0.45s ease;
+}
+.tool::before {
+  inset: -1px;
+  border-radius: inherit;
+  border: 1px solid var(--tool-light);
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--tool-light) 55%, transparent),
+    0 0 56px color-mix(in srgb, var(--tool-light) 32%, transparent),
+    inset 0 0 30px color-mix(in srgb, var(--tool-light) 14%, transparent);
+}
+.tool-icon::before {
+  inset: -36px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--tool-light) 70%, transparent), transparent 72%);
+  filter: blur(8px);
+}
+.tool h3 {
+  text-shadow:
+    0 0 12px color-mix(in srgb, var(--tool-light) var(--tool-text-glow, 0%), transparent),
+    0 0 28px color-mix(in srgb, var(--tool-light) var(--tool-text-glow, 0%), transparent);
+  transition: text-shadow 0.45s ease;
+}
+.tool[data-iluminada='true'],
+.tool:focus-visible {
+  --tool-glow: 1;
+  --tool-text-glow: 80%;
+}
+.tool:focus-visible {
+  outline: 2px solid var(--tool-light);
+  outline-offset: 5px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .tool:hover {
+    --tool-glow: 1;
+    --tool-text-glow: 80%;
+  }
 }
 
 /* Sobre mí: sin la frase vertical, la fotografía queda centrada en su columna. */
@@ -2669,6 +2709,25 @@ h2 { font-size: clamp(68px, 8.4vw, 122px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .folder-panel { animation: none; }
+}
+
+/* Contraste de lectura: solo Sobre mí y Contacto en modo claro. */
+:root[data-theme='claro'] .about {
+  --ink: #181818;
+  --muted: #454545;
+}
+:root[data-theme='claro'] .about .interests,
+:root[data-theme='claro'] .about .interests > .tiny-label,
+:root[data-theme='claro'] .about .interests > div span {
+  color: var(--ink);
+}
+:root[data-theme='claro'] .about .lead em,
+:root[data-theme='claro'] .about > .section-label > .section-number,
+:root[data-theme='claro'] .contact > .section-label > .section-number {
+  color: #c40000;
+}
+:root[data-theme='claro'] .contact {
+  --contact-ink: #181818;
 }
 
 /* ==========================================================================
