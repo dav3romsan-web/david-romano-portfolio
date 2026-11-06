@@ -277,6 +277,20 @@ function SectionLabel({
     </div>
   )
 }
+// Acentos accesibles: reservan espacio junto al texto y no capturan interacciones.
+function DetalleDecorativo({
+  simbolo,
+  ubicacion = 'titulo',
+}: {
+  simbolo: '+' | '*'
+  ubicacion?: 'titulo' | 'texto'
+}) {
+  return (
+    <span className="section-detail" data-ubicacion={ubicacion} aria-hidden="true" data-reveal>
+      <span>{simbolo}</span>
+    </span>
+  )
+}
 function PortfolioHome() {
   const [media, setMedia] = useState<Media | null>(null)
   const [herramientaIluminada, setHerramientaIluminada] = useState<string | null>(null)
@@ -353,7 +367,7 @@ function PortfolioHome() {
   return (
     <>
       <section id="inicio" className="hero">
-        <div className="hero-topline">
+        <div className="hero-topline" data-reveal>
           <span>DISEÑO CON INTENCIÓN. EDICIÓN CON RITMO.</span>
           <span>PORTAFOLIO PERSONAL — 2026</span>
         </div>
@@ -389,7 +403,7 @@ function PortfolioHome() {
               </text>
             </svg>
           </h1>
-          <div className="hero-orbit" aria-hidden="true" />
+          <div className="hero-orbit" aria-hidden="true" data-reveal />
           <div className="hero-name" data-reveal>
             <p>
               DAVID
@@ -414,7 +428,7 @@ function PortfolioHome() {
               fetchPriority="high"
             />
           </div>
-          <div className="hero-note">
+          <div className="hero-note" data-reveal>
             <span className="asterisk" aria-hidden="true">
               ✳
             </span>
@@ -429,7 +443,7 @@ function PortfolioHome() {
             </span>
           </div>
         </div>
-        <div className="hero-bottom">
+        <div className="hero-bottom" data-reveal>
           <a href="#sobre-mi">
             <span className="scroll-icon">
               <ArrowDown size={15} />
@@ -460,14 +474,18 @@ function PortfolioHome() {
             </div>
           </div>
           <div className="about-copy" data-reveal>
-            <h2>
-              SOBRE <span className="outline">MÍ</span>
-              <span className="red">.</span>
+            <h2 className="title-corner">
+              <span className="title-copy">
+                SOBRE <span className="outline">MÍ</span>
+                <span className="red">.</span>
+              </span>
+              <DetalleDecorativo simbolo="+" ubicacion="titulo" />
             </h2>
-            <p className="lead">
+            <p className="lead decorated-copy">
               Detrás de cada idea,
               <br />
               una <em>mirada diferente.</em>
+              <DetalleDecorativo simbolo="*" ubicacion="texto" />
             </p>
             <p>
               Soy <strong>David Romano Sánchez</strong>, estudiante de Diseño
@@ -502,11 +520,13 @@ function PortfolioHome() {
         <div className="section-heading" data-reveal>
           <h2>
             HERRAMIENTAS<span className="red">.</span>
+            <DetalleDecorativo simbolo="*" ubicacion="titulo" />
           </h2>
-          <p>
+          <p className="decorated-copy">
             El concepto marca el camino.
             <br />
             Las herramientas lo hacen posible.
+            <DetalleDecorativo simbolo="+" ubicacion="texto" />
           </p>
         </div>
         <div className="tool-list">
@@ -581,18 +601,22 @@ function PortfolioHome() {
       <section id="diseno-grafico" className="section graphic">
         <SectionLabel number="03">IDEAS QUE TOMAN FORMA</SectionLabel>
         <div className="section-heading" data-reveal>
-          <h2>
-            DISEÑO
-            <br />
-            <span className="outline">GRÁFICO</span>
-            <span className="red">.</span>
+          <h2 className="title-corner">
+            <span className="title-copy">
+              DISEÑO
+              <br />
+              <span className="outline">GRÁFICO</span>
+              <span className="red">.</span>
+            </span>
+            <DetalleDecorativo simbolo="+" ubicacion="titulo" />
           </h2>
           <div>
-            <p>
+            <p className="decorated-copy">
               Concepto, composición y carácter.
               <br />
               Un espacio para mi universo visual.
-            </p>
+              <DetalleDecorativo simbolo="*" ubicacion="texto" />
+          </p>
             <span className="collection-note">
               <i className="red-dot" />
               {trabajosGraficos.length
@@ -628,16 +652,20 @@ function PortfolioHome() {
       <section id="edicion-videos" className="section videos">
         <SectionLabel number="04">HISTORIAS EN MOVIMIENTO</SectionLabel>
         <div className="section-heading" data-reveal>
-          <h2>
-            EDICIÓN
-            <br />
-            DE <span className="outline">VIDEOS</span>
-            <span className="red">.</span>
+          <h2 className="title-corner">
+            <span className="title-copy">
+              EDICIÓN
+              <br />
+              DE <span className="outline">VIDEOS</span>
+              <span className="red">.</span>
+            </span>
+            <DetalleDecorativo simbolo="*" ubicacion="titulo" />
           </h2>
-          <p>
+          <p className="decorated-copy">
             Un corte. Un ritmo. Una historia.
             <br />
             Otra forma de mirar y de contar.
+            <DetalleDecorativo simbolo="+" ubicacion="texto" />
           </p>
         </div>
         <div
@@ -700,14 +728,16 @@ function PortfolioHome() {
             ¿TRABAJAMOS
             <br />
             <span>JUNTOS?</span>
+            <DetalleDecorativo simbolo="+" ubicacion="titulo" />
           </h2>
           <ArrowUpRight className="contact-arrow" strokeWidth={1} />
         </div>
         <div className="contact-bottom" data-reveal>
-          <p>
+          <p className="decorated-copy">
             ¿Tenés una idea o un proyecto en mente?
             <br />
             Hablemos y hagámoslo realidad.
+            <DetalleDecorativo simbolo="*" ubicacion="texto" />
           </p>
           <div className="contact-links" onTouchStart={() => {}}>
             <a
