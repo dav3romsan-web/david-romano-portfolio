@@ -238,7 +238,7 @@ function PanelCarpeta({
 }
 function AnimatedBackground() {
   const light = useTemaClaro()
-  const tone = light ? '#000000' : '#ffffff'
+  const tone = light ? '#ff0000' : '#ffffff'
   return (
     <FluxLines
       className="ambient-lines"
@@ -279,6 +279,16 @@ function SectionLabel({
 }
 function PortfolioHome() {
   const [media, setMedia] = useState<Media | null>(null)
+  const [herramientaIluminada, setHerramientaIluminada] = useState<string | null>(null)
+  useEffect(() => {
+    const apagarFuera = (event: PointerEvent) => {
+      if (event.target instanceof Element && !event.target.closest('.tool')) {
+        setHerramientaIluminada(null)
+      }
+    }
+    document.addEventListener('pointerdown', apagarFuera)
+    return () => document.removeEventListener('pointerdown', apagarFuera)
+  }, [])
   const [carpetaAbierta, setCarpetaAbierta] = useState<string | null>(null)
   const categoriaAbierta =
     categoriasGraficas.find((c) => c.id === carpetaAbierta) ?? null
@@ -381,9 +391,6 @@ function PortfolioHome() {
           </h1>
           <div className="hero-orbit" aria-hidden="true" />
           <div className="hero-name" data-reveal>
-            <span className="tiny-label">
-              <i /> IDEAS EN MOVIMIENTO
-            </span>
             <p>
               DAVID
               <br />
@@ -529,7 +536,33 @@ function PortfolioHome() {
               short: '04',
             },
           ].map((t) => (
-            <article className="tool" key={t.name} data-reveal>
+            <article
+              className="tool"
+              key={t.name}
+              data-reveal
+              data-app={t.icon}
+              data-iluminada={herramientaIluminada === t.icon}
+              role="button"
+              tabIndex={0}
+              aria-label={t.name}
+              aria-pressed={herramientaIluminada === t.icon}
+              onClick={() => {
+                setHerramientaIluminada((actual) => actual === t.icon ? null : t.icon)
+              }}
+              onPointerLeave={(event) => {
+                if (event.pointerType === 'mouse') setHerramientaIluminada(null)
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  if (!event.repeat) {
+                    setHerramientaIluminada((actual) => actual === t.icon ? null : t.icon)
+                  }
+                }
+                if (event.key === 'Escape') setHerramientaIluminada(null)
+              }}
+              onBlur={() => setHerramientaIluminada(null)}
+            >
               <span className="tool-index">/{t.short}</span>
               <div className={'tool-icon ' + t.icon}>
                 <img

@@ -140,8 +140,7 @@ void main() {
   vec3 tint = palette(h);
 
   if (uLight > 0.5) {
-    float chroma = max(tint.r, max(tint.g, tint.b)) - min(tint.r, min(tint.g, tint.b));
-    vec3 ink = mix(vec3(0.07, 0.07, 0.08), tint * 0.55, clamp(chroma * 1.6, 0.0, 1.0));
+    vec3 ink = tint;
     float cover = energy * uOpacity;
     outColor = uOpaque > 0.5 ? vec4(mix(uBackground, ink, cover), 1.0) : vec4(ink * cover, cover);
     return;
